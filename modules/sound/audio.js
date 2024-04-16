@@ -69,21 +69,12 @@ class AudioSound {
     }
 
     _createAudioBox() {
-        this._createAudioContext();
 
-        this.setupSamples().then((response) => {
-            this.bufferedSamples = response;
-            console.log(this.bufferedSamples);
-
-            const eventGameSamplesLoaded = new Event('modules.audio.samples.loaded');
-            dispatchEvent(eventGameSamplesLoaded);
-            this._currentSubscribe();
-        });
-        // this.noteFreq = this.createNoteTable();
         this._createAudioDiv();
         this._createPlayController();
         this._createVolumeControl();
         this._createStereoControl();
+        this._currentSubscribe();
     }
 
     _createAudioContext() {
@@ -93,6 +84,14 @@ class AudioSound {
         this.stereoBalance = new StereoPannerNode(this.audioContext, stereoOptions);
         this.stereoBalance.connect(this.audioContext.destination);
         this.mainGainNode.connect(this.stereoBalance);
+
+        this.setupSamples().then((response) => {
+            this.bufferedSamples = response;
+            console.log(this.bufferedSamples);
+
+            const eventGameSamplesLoaded = new Event('modules.audio.samples.loaded');
+            dispatchEvent(eventGameSamplesLoaded);
+        });
     }
 
     _createAudioDiv() {
@@ -287,24 +286,23 @@ class AudioSound {
 
     _subscribe() {
         addEventListener('module.audio.init', (event) => {
-
             if (event.detail === false) {
                 this.soundMute = true;
+
             }
             if (!this.trask) {
-                this._createAudioBox();
                 this.trask = true;
             }
+            this._createAudioContext();
         });
 
         addEventListener('pauseGame.geme.stop', this._changeToggleSoundState.bind(this, 'pause'));
         addEventListener('pauseGame.geme.run', this._changeToggleSoundState.bind(this, 'play'));
 
-        // addEventListener('module.audio.play', (event) => {
+        addEventListener('Core.sceneWasCreated', () => {
+            this._createAudioBox();
+        });
 
-        //     this._play(event.detail);
-
-        // })
         // addEventListener('module.audio.stop', (event) => {
         //     this._stop(event.detail);
 

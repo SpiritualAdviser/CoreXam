@@ -22,8 +22,7 @@ class BaseCoreLogics {
         this.createComponents(gameScene.components);
         const pauseGame = new PauseGame();
         const device = new Device();
-        // const sounds = new Sounds();
-        let event = new Event('Core.sceneWasCreated');
+        // const sounds = new Sounds()
 
         if (this.gameComponents.length > 0) {
 
@@ -39,7 +38,6 @@ class BaseCoreLogics {
             })
         }
         const statesManager = new StatesManager();
-        dispatchEvent(event);
     }
 
     createComponents(gameElements, lastDivComponent) {
@@ -285,6 +283,10 @@ class BaseCoreLogics {
     }
 
     test() {
+        setTimeout(() => {
+            let event = new Event('Core.sceneWasCreated');
+            dispatchEvent(event);
+        }, 500);
 
     }
     // playSpriteAnimation(canvas, animationName, animationRepeat) {
@@ -296,7 +298,7 @@ class BaseCoreLogics {
     // }
 
     _subscribe() {
-        // addEventListener('StatesManager.states.Run', this.test)
+        addEventListener('modules.audio.samples.loaded', this.test)
 
     };
 }

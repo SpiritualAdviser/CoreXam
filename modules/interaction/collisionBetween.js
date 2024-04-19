@@ -149,10 +149,10 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     removeCollision(element, needDestroy, timeLazyDestroy = false) {
 
         const selektorId = element.id;
-        this.bulets.skelets = this.filterCollisionObjects(this.bulets.skelets, selektorId);
-        this.bulets.mainObjects = this.filterCollisionObjects(this.bulets.mainObjects, selektorId, true);
+        this.bulets.skelets = this.filterCollisionObjects(this.bulets.skelets, selektorId, needDestroy);
+        this.bulets.mainObjects = this.filterCollisionObjects(this.bulets.mainObjects, selektorId, needDestroy, true);
         this.targets.skelets = this.filterCollisionObjects(this.targets.skelets, selektorId);
-        this.targets.mainObjects = this.filterCollisionObjects(this.targets.mainObjects, selektorId, true);
+        this.targets.mainObjects = this.filterCollisionObjects(this.targets.mainObjects, selektorId, needDestroy, true);
 
         if (needDestroy && this.destroyElements.length > 0) {
             this.destroyElements.forEach(element => {
@@ -167,15 +167,19 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
         dispatchEvent(eventName);
     }
 
-    filterCollisionObjects(arrayObjects, selektorId, mainObjects) {
+    filterCollisionObjects(arrayObjects, selektorId, needDestroy, mainObjects) {
         let necessaryObjects = [];
         arrayObjects.forEach(element => {
 
             if (element.id === selektorId || element.skeletId === selektorId) {
-                this.destroyElements.push(element);
-                if (mainObjects) {
-                    this.fireEventOnColision(this.eventObjectOnDestroy, { element });
+
+                if (needDestroy) {
+                    this.destroyElements.push(element);
+                    if (mainObjects) {
+                        this.fireEventOnColision(this.eventObjectOnDestroy, { element });
+                    }
                 }
+
             } else {
                 necessaryObjects.push(element);
             }

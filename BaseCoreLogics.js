@@ -3,7 +3,7 @@ const SpriteLogic = require('./SpriteLogic.js');
 const ButtonsLogic = require('./modules/objects/buttons.js');
 const PauseGame = require('./modules/gameUI/pauseGame.js');
 const Device = require('./modules/gameUI/device.js');
-const Sounds = require('./modules/sound/audio.js');
+// const Sounds = require('./modules/sound/audio.js');
 class BaseCoreLogics {
     constructor() {
         this.scene = document.getElementById('scene');
@@ -38,6 +38,11 @@ class BaseCoreLogics {
             })
         }
         const statesManager = new StatesManager();
+        if (!CoreXam.App.Modules.AudioGame) {
+
+            const eventGameSamplesLoaded = new Event('modules.audio.samples.loaded');
+            dispatchEvent(eventGameSamplesLoaded);
+        }
     }
 
     createComponents(gameElements, lastDivComponent) {

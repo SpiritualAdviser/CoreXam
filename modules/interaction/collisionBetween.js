@@ -12,6 +12,12 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
         this.eventObjectIsOutside = new Event('CollisionBetween.ObjectIsOutside');
         this.eventObjectOnDestroy = new Event('CollisionBetween.ObjectOnDestroy');
         this.colisionState = true;
+        this.bordeAreaColision = {
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        };
     }
 
     run() {
@@ -94,12 +100,12 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     }
 
     checkCollision(targetSkelet, buletSkelet) { // need optimisation
-
+    
         let IsCollision = false;
         const buletOpt = this.getCoords(buletSkelet);
 
-        if (buletOpt.top > 0 && buletOpt.bottom < this.scene.clientHeight &&
-            buletOpt.left > 0 && buletOpt.right < this.scene.clientWidth) {
+        if (buletOpt.top > this.bordeAreaColision.top && buletOpt.bottom < this.scene.clientHeight - this.bordeAreaColision.bottom &&
+            buletOpt.left > this.bordeAreaColision.left && buletOpt.right < this.scene.clientWidth - this.bordeAreaColision.right) {
 
 
         } else {
@@ -110,8 +116,8 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
         if (targetSkelet) {
             const targetOpt = this.getCoords(targetSkelet);
 
-            if (targetOpt.top > 0 && targetOpt.bottom < this.scene.clientHeight &&
-                targetOpt.left > 0 && targetOpt.right < this.scene.clientWidth) {
+            if (targetOpt.top > this.bordeAreaColision.top && targetOpt.bottom < this.scene.clientHeight - this.bordeAreaColision.bottom &&
+                targetOpt.left > this.bordeAreaColision.left && targetOpt.right < this.scene.clientWidth - this.bordeAreaColision.right) {
 
                 let xColl = false;
                 let yColl = false;
@@ -186,5 +192,10 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
         });
         return necessaryObjects;
     }
+
+    setColisionOption(borderOption) {
+        this.bordeAreaColision = borderOption;
+    }
+
 }
 module.exports = CollisionBetween;

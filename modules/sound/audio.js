@@ -100,8 +100,8 @@ class AudioSound {
         this.audioDiv.style.flexDirection = 'column';
         this.audioDiv.style.position = 'absolute';
         this.audioDiv.style.width = '85px';
-        this.audioDiv.style.bottom = '20px';
-        this.audioDiv.style.right = '20px';
+        this.audioDiv.style.bottom = '1%';
+        this.audioDiv.style.right = '2%';
 
         this.scene.append(this.audioDiv);
     }

@@ -208,7 +208,7 @@ class AudioSound {
 
     play(sampleName, time) {
 
-        if (this.soundMute) {
+        if (this.soundMute && this.volumeControl) {
             this.volumeControl.value = 0;
             this._changeVolume();
         }
@@ -299,7 +299,7 @@ class AudioSound {
         addEventListener('pauseGame.geme.stop', this._changeToggleSoundState.bind(this, 'pause'));
         addEventListener('pauseGame.geme.run', this._changeToggleSoundState.bind(this, 'play'));
 
-        addEventListener('Core.sceneWasCreated', () => {
+        addEventListener('loadGame.gameResourcesReady', () => {
             this._createAudioBox();
         });
 

@@ -264,7 +264,7 @@ class AudioSound {
                 }
             }
         }
-
+d
     }
 
     _currentSubscribe() {
@@ -296,7 +296,6 @@ class AudioSound {
             if (!this.trask) {
                 this.trask = true;
             }
-            debugger
             this._createAudioContext();
         });
 

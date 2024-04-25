@@ -264,7 +264,7 @@ class AudioSound {
                 }
             }
         }
-d
+
     }
 
     _currentSubscribe() {

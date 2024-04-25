@@ -207,8 +207,11 @@ class AudioSound {
     }
 
     play(sampleName, time) {
+        if (!this.volumeControl) {
+            return
+        }
 
-        if (this.soundMute && this.volumeControl) {
+        if (this.soundMute) {
             this.volumeControl.value = 0;
             this._changeVolume();
         }
@@ -293,6 +296,7 @@ class AudioSound {
             if (!this.trask) {
                 this.trask = true;
             }
+            debugger
             this._createAudioContext();
         });
 

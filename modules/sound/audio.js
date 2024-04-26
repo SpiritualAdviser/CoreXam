@@ -75,6 +75,8 @@ class AudioSound {
         this._createVolumeControl();
         this._createStereoControl();
         this._currentSubscribe();
+        const eventaudioBoxReady = new Event('modules.audio.audioBox.ready');
+        dispatchEvent(eventaudioBoxReady);
     }
 
     _createAudioContext() {
@@ -96,10 +98,11 @@ class AudioSound {
 
     _createAudioDiv() {
         this.audioDiv = document.createElement('div');
+        this.audioDiv.id = 'audioDiv';
         this.audioDiv.style.display = 'flex';
         this.audioDiv.style.flexDirection = 'column';
         this.audioDiv.style.position = 'absolute';
-        this.audioDiv.style.width = '85px';
+        // this.audioDiv.style.width = '85px';
         this.audioDiv.style.bottom = '1%';
         this.audioDiv.style.right = '2%';
 
@@ -108,6 +111,7 @@ class AudioSound {
 
     _createPlayController() {
         this.playButton = document.createElement('button');
+        this.playButton.id = 'audioPlayButton';
         this.playButton.setAttribute('data-playing', false);
         this.playButton.setAttribute('role', 'switch');
         this.playButton.setAttribute('aria-checked', false);
@@ -115,6 +119,7 @@ class AudioSound {
 
         const span = document.createElement('span');
         span.style.backgroundColor = 'black';
+        span.id = 'audioPlayText';
         span.style.color = '#ffe2df';
         span.textContent = 'Play/Pause';
 
@@ -129,7 +134,7 @@ class AudioSound {
         this.volumeControl.setAttribute('max', '2');
         this.volumeControl.setAttribute('value', '1');
         this.volumeControl.setAttribute('step', '0.01');
-        this.volumeControl.id = 'volume';
+        this.volumeControl.id = 'audioVolumeControl';
         this.volumeControl.style.pointerEvents = 'all';
         this.audioDiv.appendChild(this.volumeControl);
     }
@@ -142,7 +147,7 @@ class AudioSound {
         this.stereoControl.setAttribute('max', '1');
         this.stereoControl.setAttribute('value', '0');
         this.stereoControl.setAttribute('step', '0.01');
-        this.stereoControl.id = 'stereoControl';
+        this.stereoControl.id = 'audioStereoControl';
         this.stereoControl.style.pointerEvents = 'all';
         this.audioDiv.appendChild(this.stereoControl);
     }
@@ -201,6 +206,10 @@ class AudioSound {
 
     _changeVolume() {
         this.mainGainNode.gain.value = this.volumeControl.value;
+        const eventvolumeControlValue = new Event('modules.audio.volumeControl.value');
+        eventvolumeControlValue.detail = this.mainGainNode.gain.value;
+        dispatchEvent(eventvolumeControlValue);
+
     }
     _changeStereoBalance() {
         this.stereoBalance.pan.value = this.stereoControl.value;

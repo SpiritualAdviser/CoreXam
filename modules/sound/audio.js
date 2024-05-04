@@ -104,7 +104,7 @@ class AudioSound {
         this.audioDiv.style.position = 'absolute';
         // this.audioDiv.style.width = '85px';
         this.audioDiv.style.bottom = '1%';
-        this.audioDiv.style.right = '2%';
+        this.audioDiv.style.right = '1.4%';
 
         this.scene.append(this.audioDiv);
     }

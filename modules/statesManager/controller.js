@@ -25,6 +25,7 @@ class StatesManagerController {
     startState() {
         console.log('%c State ' + this._nameOfState, 'background: #bada55; color: #000');
         dispatchEvent(this.statesManagerEventRun);
+        CoreXam.gameStage.currentStage = this._nameOfState;
         if (this._currentState) {
             if (this._currentState.action) {
                 this._runAction(this._currentState.action);

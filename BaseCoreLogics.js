@@ -1,8 +1,8 @@
 const StatesManager = require('./modules/statesManager/controller.js');
 const SpriteLogic = require('./SpriteLogic.js');
 const ButtonsLogic = require('./modules/objects/buttons.js');
-const PauseGame = require('./modules/gameUI/pauseGame.js');
-const Device = require('./modules/gameUI/device.js');
+const PauseGame = require('./modules/gameLogic/pauseGame.js');
+const Device = require('./modules/gameLogic/device.js');
 // const Sounds = require('./modules/sound/audio.js');
 class BaseCoreLogics {
     constructor() {

@@ -10,6 +10,7 @@
     "build:prod": "webpack --config webpack.config.js --mode=production",
     "start": "webpack server --open --mode development",
     "build:dev": "webpack --config webpack.config.js --mode=development"
+    
   },
   "repository": {
     "type": "git",

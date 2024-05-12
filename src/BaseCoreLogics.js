@@ -6,6 +6,7 @@ const Device = require('./modules/gameLogic/device.js');
 // const Sounds = require('./modules/sound/audio.js');
 class BaseCoreLogics {
     constructor() {
+        debugger
         this.scene = document.getElementById('scene');
         this.gameModules = [];
         this.gameComponents = [];
@@ -37,6 +38,7 @@ class BaseCoreLogics {
                 this.startLogic(modul);
             })
         }
+
         const statesManager = new StatesManager();
         if (!CoreXam.App.Modules.AudioGame) {
 

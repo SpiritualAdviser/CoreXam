@@ -1,1 +1,2 @@
-CoreXam - HTML5 game engine
+# CoreXam - HTML5 game engine 
+### [Demo projects](https://spiritualadviser.github.io/standcorexam/index.html 'Demo projects') made using this engine.

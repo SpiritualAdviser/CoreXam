@@ -161,4 +161,4 @@ class SpriteLogic {
     }
 }
 module.exports = SpriteLogic;
-console.log('=>BaseAnimationLogic is completed');
+

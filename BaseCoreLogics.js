@@ -284,7 +284,7 @@ class BaseCoreLogics {
         } else {
             element.remove();
         }
-        console.log('element destroed');
+        // console.log('element destroed');
     }
 
     test() {

@@ -39,11 +39,14 @@ class BaseCoreLogics {
             })
         }
 
-        const statesManager = new StatesManager();
-        if (!CoreXam.App.Modules.AudioGame) {
+        if (CoreXam.App.Modules) {
 
-            const eventGameSamplesLoaded = new Event('modules.audio.samples.loaded');
-            dispatchEvent(eventGameSamplesLoaded);
+            const statesManager = new StatesManager();
+            if (!CoreXam.App.Modules.AudioGame) {
+
+                const eventGameSamplesLoaded = new Event('modules.audio.samples.loaded');
+                dispatchEvent(eventGameSamplesLoaded);
+            }
         }
     }
 

@@ -11,17 +11,15 @@
     "start": "webpack server --open --mode development",
     "build:dev": "webpack --config webpack.config.js --mode=development"
   },
-    "repository": {
+  "repository": {
     "type": "git",
-    "url": "https://github.com/SpiritualAdviser/CoreXam.git"
-     },
-
+    "url": "git+https://github.com/SpiritualAdviser/CoreXam.git"
+  },
   "devDependencies": {
     "webpack": "^5.90.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
   },
-  
   "keywords": [
     "game",
     "html",

@@ -5,7 +5,7 @@ class StatesManagerController {
         this._nameOfState = 'INIT';
         this._currentState = false;
         this.createdGameActions = [];
-        
+
         if (CoreXam.App.Modules && CoreXam.App.Modules.ConfigStates) {
             this.configStates = new CoreXam.App.Modules.ConfigStates();
 
@@ -15,6 +15,8 @@ class StatesManagerController {
             this._subscribe();
             this._getCurrentState();
             this.startState();
+        } else {
+
         }
     }
 

@@ -1,0 +1,29 @@
+{
+  "name": "corexam-html-helper",
+  "description": "HTML5 game engine",
+  "author": "PomaXam",
+  "license": "ISC",
+  "homepage": "https://github.com/SpiritualAdviser/CoreXam",
+  "main": "load.js",
+  "version": "0.1.11",
+  "scripts": {
+    "build:prod": "webpack --config webpack.config.js --mode=production",
+    "start": "webpack server --open --mode development",
+    "build:dev": "webpack --config webpack.config.js --mode=development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SpiritualAdviser/CoreXam.git"
+  },
+  "devDependencies": {
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "keywords": [
+    "game",
+    "html",
+    "engine"
+  ]
+}
+

@@ -18,9 +18,19 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             left: 0,
             right: 0
         };
+
+        // onresize = (event) => { this.setColisionArea() };
     }
 
+    // setColisionArea() {
+    //     this.bordeAreaColision.bottom = this.scene.clientHeight - this.bordeAreaColision.bottom;
+    //     this.bordeAreaColision.right = this.scene.clientWidth - this.bordeAreaColision.right;
+
+    // }
+
     run() {
+
+        // this.setColisionArea();
         this.scene = document.getElementById('scene');
         let loop = () => {
             if (this.colisionState) {
@@ -100,24 +110,33 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     }
 
     checkCollision(targetSkelet, buletSkelet) { // need optimisation
-    
+
         let IsCollision = false;
         const buletOpt = this.getCoords(buletSkelet);
+     
+        if (buletOpt.bottom > this.bordeAreaColision.top && buletOpt.top < this.scene.clientHeight - this.bordeAreaColision.bottom &&
+            buletOpt.right > this.bordeAreaColision.left && buletOpt.left < this.scene.clientWidth - this.bordeAreaColision.right) {
 
-        if (buletOpt.top > this.bordeAreaColision.top && buletOpt.bottom < this.scene.clientHeight - this.bordeAreaColision.bottom &&
-            buletOpt.left > this.bordeAreaColision.left && buletOpt.right < this.scene.clientWidth - this.bordeAreaColision.right) {
-
+            if (buletSkelet.outside) {
+                buletSkelet.outside = false;
+            }
 
         } else {
-            buletSkelet.option = buletOpt;
-            this.fireEventOnColision(this.eventObjectIsOutside, { element: buletSkelet });
+
+            if (!buletSkelet.outside) {
+                buletSkelet.option = buletOpt;
+                buletSkelet.outside = true;
+                this.fireEventOnColision(this.eventObjectIsOutside, { element: buletSkelet });
+            }
         }
 
         if (targetSkelet) {
             const targetOpt = this.getCoords(targetSkelet);
 
-            if (targetOpt.top > this.bordeAreaColision.top && targetOpt.bottom < this.scene.clientHeight - this.bordeAreaColision.bottom &&
-                targetOpt.left > this.bordeAreaColision.left && targetOpt.right < this.scene.clientWidth - this.bordeAreaColision.right) {
+            if (targetOpt.bottom > this.bordeAreaColision.top && targetOpt.top < this.scene.clientHeight - this.bordeAreaColision.bottom &&
+                targetOpt.right > this.bordeAreaColision.left && targetOpt.left < this.scene.clientWidth - this.bordeAreaColision.right) {
+
+                targetSkelet.outside = false;
 
                 let xColl = false;
                 let yColl = false;
@@ -137,8 +156,12 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
                 }
 
             } else {
-                targetSkelet.option = targetOpt;
-                this.fireEventOnColision(this.eventObjectIsOutside, { element: targetSkelet });
+
+                if (!targetSkelet.outside) {
+                    targetSkelet.option = targetOpt;
+                    targetSkelet.outside = true;
+                    this.fireEventOnColision(this.eventObjectIsOutside, { element: targetSkelet });
+                }
             }
         }
     }

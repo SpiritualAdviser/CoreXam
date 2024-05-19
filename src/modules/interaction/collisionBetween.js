@@ -3,37 +3,28 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     constructor() {
         super();
         this.requestAnimationFrameloop = false;
-        this.bulets = { mainObjects: [], skelets: [] };
-        this.targets = { mainObjects: [], skelets: [] };
-        this.destroyElements = [];
+        this.groupObjects = [];
+        this.relationGroups = false;
         this.tickCount = 0;
         this.ticksPerFrame = 2;
+
         this.eventIsCollisions = new Event('CollisionBetween.IsCollisions');
         this.eventObjectIsOutside = new Event('CollisionBetween.ObjectIsOutside');
-        this.eventObjectOnDestroy = new Event('CollisionBetween.ObjectOnDestroy');
-        this.colisionState = true;
+        this.colisionRun = true;
         this.bordeAreaColision = {
             top: 0,
             bottom: 0,
             left: 0,
             right: 0
         };
-
-        // onresize = (event) => { this.setColisionArea() };
     }
 
-    // setColisionArea() {
-    //     this.bordeAreaColision.bottom = this.scene.clientHeight - this.bordeAreaColision.bottom;
-    //     this.bordeAreaColision.right = this.scene.clientWidth - this.bordeAreaColision.right;
-
-    // }
-
     run() {
-
-        // this.setColisionArea();
         this.scene = document.getElementById('scene');
+
         let loop = () => {
-            if (this.colisionState) {
+
+            if (this.colisionRun) {
                 if (CoreXam.gameStage.palayGame === 'run') {
                     this.runCollision();
                 }
@@ -43,177 +34,152 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
         this.requestAnimationFrameloop = window.requestAnimationFrame(loop);
     }
 
-    addObjectToCollision(newObjectOnScene, typeOfObject) {
+    addObjectToCollision(newObject, typeObject) {
+        this.addToGroup(newObject, typeObject);
 
-        if (typeOfObject === 'target') {
-            this.getSkeletObject(newObjectOnScene, 'target');
-        } else {
-            this.getSkeletObject(newObjectOnScene, false);
-        }
     }
 
-    getSkeletObject(newObjectOnScene, typeOfObject) {// придумать нормальное имя
-        let skeletsObject = false;
+    addToGroup(newObject, typeObject) {
 
-        if (newObjectOnScene.skeletId) {
-            skeletsObject = newObjectOnScene.querySelectorAll(`#${newObjectOnScene.skeletId}`);
-            skeletsObject.forEach(objectSkelet => {
-                if (typeOfObject === 'target') {
-                    this.targets.skelets.push(objectSkelet);
-                } else {
-                    this.bulets.skelets.push(objectSkelet);
+        const curentGpoup = this.groupObjects.find(group => group.id === typeObject);
+
+        if (curentGpoup) {
+            curentGpoup.objects.push(newObject);
+
+        } else {
+
+            const newGroup = {
+                objects: [],
+            };
+            newGroup.id = typeObject;
+            newGroup.relationGroups = this.getRelationGroups(typeObject);
+            newGroup.objects.push(newObject);
+            this.groupObjects.push(newGroup);
+        }
+        newObject.collision = true;
+    }
+
+    getRelationGroups(typeObject) {
+        if (this.relationGroups) {
+            let nameRelationGroups = false;
+            for (let key in this.relationGroups) {
+
+                if (key === typeObject) {
+                    nameRelationGroups = this.relationGroups[key];
                 }
-            });
-        } else {
-            if (typeOfObject === 'target') {
-                this.targets.skelets.push(newObjectOnScene);
-            } else {
-                this.bulets.skelets.push(newObjectOnScene);
             }
-        };
-
-        if (typeOfObject === 'target') {
-            this.targets.mainObjects.push(newObjectOnScene);
-        } else {
-            this.bulets.mainObjects.push(newObjectOnScene);
-        }
-    }
-
-    collisionSwich(colisionState) {
-        this.colisionState = colisionState;
-        if (colisionState) {
-            this.run();
-        } else {
-            this.bulets = { mainObjects: [], skelets: [] };
-            this.targets = { mainObjects: [], skelets: [] };
+            return nameRelationGroups;
         }
     }
 
     runCollision() {
         this.tickCount++;
+
         if (this.tickCount > this.ticksPerFrame) {
             this.tickCount = 0;
-            // console.log('runCollision');
-            if (this.targets.skelets.length > 0) {
-                this.targets.skelets.forEach(targetSkelet => {
 
-                    this.bulets.skelets.forEach(buletSkelet => {
-                        this.checkCollision(targetSkelet, buletSkelet)
-                    })
-                });
-            } else if (this.bulets.skelets.length > 0) {
-                this.bulets.skelets.forEach(buletSkelet => {
-                    this.checkCollision(false, buletSkelet);
-                })
-            }
+            this.groupObjects.forEach(mainGroup => {
+
+                if (mainGroup.relationGroups) {
+                    this.findReletionGroup(mainGroup);
+                }
+            });
         }
     }
 
-    checkCollision(targetSkelet, buletSkelet) { // need optimisation
+    findReletionGroup(mainGroup) { // need optimisation
 
-        let IsCollision = false;
-        const buletOpt = this.getCoords(buletSkelet);
-     
-        if (buletOpt.bottom > this.bordeAreaColision.top && buletOpt.top < this.scene.clientHeight - this.bordeAreaColision.bottom &&
-            buletOpt.right > this.bordeAreaColision.left && buletOpt.left < this.scene.clientWidth - this.bordeAreaColision.right) {
+        mainGroup.relationGroups.forEach(reletionGroup => {
 
-            if (buletSkelet.outside) {
-                buletSkelet.outside = false;
+            const curentReletionGroup = this.groupObjects.find(group => group.id === reletionGroup);
+
+            if (curentReletionGroup) {
+                mainGroup.objects.forEach(mainObject => {
+
+                    if (mainObject.collision) {
+                        curentReletionGroup.objects.forEach(relationObject => {
+
+                            if (relationObject.collision) {
+                                this.checkOutsidePosition(mainObject);
+                                this.checkOutsidePosition(relationObject);
+
+                                if (!mainObject.outside && !relationObject.outside) {
+                                    this.checkCollision(mainObject, relationObject);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    checkOutsidePosition(verifyObject) {
+
+        const verifyObjectOpt = this.getCoords(verifyObject);
+        verifyObject.option = verifyObjectOpt;
+
+        if (verifyObjectOpt.bottom > this.bordeAreaColision.top && verifyObjectOpt.top < this.scene.clientHeight - this.bordeAreaColision.bottom &&
+            verifyObjectOpt.right > this.bordeAreaColision.left && verifyObjectOpt.left < this.scene.clientWidth - this.bordeAreaColision.right) {
+
+            if (verifyObject.outside) {
+                verifyObject.outside = false;
             }
 
         } else {
 
-            if (!buletSkelet.outside) {
-                buletSkelet.option = buletOpt;
-                buletSkelet.outside = true;
-                this.fireEventOnColision(this.eventObjectIsOutside, { element: buletSkelet });
+            if (!verifyObject.outside) {
+                verifyObject.outside = true;
+                this.fireEventOnColision(this.eventObjectIsOutside, { element: verifyObject });
             }
         }
+    }
 
-        if (targetSkelet) {
-            const targetOpt = this.getCoords(targetSkelet);
+    checkCollision(mainObject, relationObject) {
 
-            if (targetOpt.bottom > this.bordeAreaColision.top && targetOpt.top < this.scene.clientHeight - this.bordeAreaColision.bottom &&
-                targetOpt.right > this.bordeAreaColision.left && targetOpt.left < this.scene.clientWidth - this.bordeAreaColision.right) {
+        const mainObjectOpt = mainObject.option;
+        const relationObjectOpt = relationObject.option;
 
-                targetSkelet.outside = false;
+        let xColl = false;
+        let yColl = false;
+        let IsCollision = false;
 
-                let xColl = false;
-                let yColl = false;
+        xColl = (mainObjectOpt.right > relationObjectOpt.left)
+            && (mainObjectOpt.left < relationObjectOpt.right);
 
-                xColl = ((buletOpt.left + buletOpt.width) > targetOpt.left)
-                    && (buletOpt.left < targetOpt.right);
+        yColl = (mainObjectOpt.bottom > relationObjectOpt.top)
+            && (mainObjectOpt.top < relationObjectOpt.bottom)
 
-                yColl = ((buletOpt.top + buletOpt.height) > targetOpt.top)
-                    && (buletOpt.top < targetOpt.bottom)
+        IsCollision = (xColl && yColl);
 
-                IsCollision = (xColl && yColl);
+        if (IsCollision) {
+            this.fireEventOnColision(this.eventIsCollisions, { mainObj: mainObject, relationObj: relationObject, });
+        }
+    }
 
-                if (IsCollision) {
-                    targetSkelet.option = targetOpt;
-                    buletSkelet.option = buletOpt;
-                    this.fireEventOnColision(this.eventIsCollisions, { target: targetSkelet, bulet: buletSkelet, });
-                }
-
-            } else {
-
-                if (!targetSkelet.outside) {
-                    targetSkelet.option = targetOpt;
-                    targetSkelet.outside = true;
-                    this.fireEventOnColision(this.eventObjectIsOutside, { element: targetSkelet });
-                }
-            }
+    collisionSwich(colisionRun) {
+        this.colisionRun = colisionRun;
+        if (colisionRun) {
+            this.run();
         }
     }
 
     getCoords(element) {
         let elementOptions = element.getBoundingClientRect();
-
-        if (element.skeletOfset) {
-            elementOptions = this.setSizeSkeletForm(elementOptions, element.skeletOfset);
-        }
         return elementOptions;
     }
 
     removeCollision(element, needDestroy, timeLazyDestroy = false) {
+        element.collision = false;
 
-        const selektorId = element.id;
-        this.bulets.skelets = this.filterCollisionObjects(this.bulets.skelets, selektorId, needDestroy);
-        this.bulets.mainObjects = this.filterCollisionObjects(this.bulets.mainObjects, selektorId, needDestroy, true);
-        this.targets.skelets = this.filterCollisionObjects(this.targets.skelets, selektorId);
-        this.targets.mainObjects = this.filterCollisionObjects(this.targets.mainObjects, selektorId, needDestroy, true);
-
-        if (needDestroy && this.destroyElements.length > 0) {
-            this.destroyElements.forEach(element => {
-                this.destroyElement(element, timeLazyDestroy);
-            });
-            this.destroyElements = [];
+        if (needDestroy) {
+            this.destroyElement(element, timeLazyDestroy);
         }
     }
 
     fireEventOnColision(eventName, detail) {
         eventName.detail = detail;
         dispatchEvent(eventName);
-    }
-
-    filterCollisionObjects(arrayObjects, selektorId, needDestroy, mainObjects) {
-        let necessaryObjects = [];
-        arrayObjects.forEach(element => {
-
-            if (element.id === selektorId || element.skeletId === selektorId) {
-
-                if (needDestroy) {
-                    this.destroyElements.push(element);
-                    if (mainObjects) {
-                        this.fireEventOnColision(this.eventObjectOnDestroy, { element });
-                    }
-                }
-
-            } else {
-                necessaryObjects.push(element);
-            }
-        });
-        return necessaryObjects;
     }
 
     setColisionOption(borderOption) {

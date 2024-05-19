@@ -35,6 +35,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     }
 
     addObjectToCollision(newObject, typeObject) {
+
         this.addToGroup(newObject, typeObject);
 
     }
@@ -104,7 +105,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
                                 this.checkOutsidePosition(relationObject);
 
                                 if (!mainObject.outside && !relationObject.outside) {
-                                    this.checkCollision(mainObject, relationObject);
+                                    this.checkCollisionBorder(mainObject, relationObject);
                                 }
                             }
                         });
@@ -135,6 +136,50 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
         }
     }
 
+    checkCollisionBorder(mainObject, relationObject) {
+        let mainBorderArray = [];
+        let relationBorderArray = [];
+
+        if (mainObject.colisionBorder) {
+            mainBorderArray = this.setBorderOption(mainObject);
+        } else {
+            mainBorderArray.push(mainObject);
+        }
+
+        if (relationObject.colisionBorder) {
+            relationBorderArray = this.setBorderOption(relationObject);
+        } else {
+            relationBorderArray.push(relationObject);
+        }
+
+        mainBorderArray.forEach(mainObj => {
+
+            relationBorderArray.forEach(relationObj => {
+
+                this.checkCollision(mainObj, relationObj);
+            });
+        });
+    }
+
+    setBorderOption(element) {
+        const borderArray = [];
+        element.colisionBorder.forEach(border => {
+
+            const newObject = {
+                option: {},
+                curentElement: element,
+            }
+
+            newObject.option.left = element.option.left + border.leftOfset;
+            newObject.option.right = newObject.option.left + border.widthArea;
+            newObject.option.top = element.option.top + border.topOfset;
+            newObject.option.bottom = newObject.option.top + border.heightArea;
+            borderArray.push(newObject);
+        });
+        return borderArray;
+    }
+
+
     checkCollision(mainObject, relationObject) {
 
         const mainObjectOpt = mainObject.option;
@@ -153,8 +198,22 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
         IsCollision = (xColl && yColl);
 
         if (IsCollision) {
-            this.fireEventOnColision(this.eventIsCollisions, { mainObj: mainObject, relationObj: relationObject, });
+            const curentMainObject = this.getElementOnColision(mainObject);
+            const curentrelationObject = this.getElementOnColision(relationObject);
+
+            this.fireEventOnColision(this.eventIsCollisions, { mainObj: curentMainObject, relationObj: curentrelationObject, });
         }
+    }
+
+    getElementOnColision(element) {
+        let curentElement = false;
+
+        if (element.curentElement) {
+            curentElement = element.curentElement;
+        } else {
+            curentElement = element;
+        }
+        return curentElement;
     }
 
     collisionSwich(colisionRun) {

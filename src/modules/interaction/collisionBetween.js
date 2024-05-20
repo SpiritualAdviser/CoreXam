@@ -152,12 +152,25 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             relationBorderArray.push(relationObject);
         }
 
-        mainBorderArray.forEach(mainObj => {
+        mainBorderArray.forEach(mainBorder => {
 
-            relationBorderArray.forEach(relationObj => {
+            const IsCollision = relationBorderArray.find(relationBorder => this.checkCollision(mainBorder, relationBorder));
 
-                this.checkCollision(mainObj, relationObj);
-            });
+            if (IsCollision) {
+                this.fireEventOnColision(this.eventIsCollisions, { mainObj: mainObject, relationObj: relationObject, });
+            }
+
+            // relationBorderArray.forEach(relationObj => {
+
+            //     const IsCollision = this.checkCollision(mainObj, relationObj);
+
+            //     if (IsCollision) { // need to fix twise fire event if 2 dorder parrams
+            //         // const curentMainObject = this.getElementOnColision(mainObject);
+            //         // const curentrelationObject = this.getElementOnColision(relationObject);
+
+            //         this.fireEventOnColision(this.eventIsCollisions, { mainObj: curentMainObject, relationObj: curentrelationObject, });
+            //     }
+            // });
         });
     }
 
@@ -167,7 +180,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
 
             const newObject = {
                 option: {},
-                curentElement: element,
+                // collisionElement: element,
             }
 
             newObject.option.left = element.option.left + border.leftOfset;
@@ -197,24 +210,19 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
 
         IsCollision = (xColl && yColl);
 
-        if (IsCollision) {
-            const curentMainObject = this.getElementOnColision(mainObject);
-            const curentrelationObject = this.getElementOnColision(relationObject);
-
-            this.fireEventOnColision(this.eventIsCollisions, { mainObj: curentMainObject, relationObj: curentrelationObject, });
-        }
+        return IsCollision
     }
 
-    getElementOnColision(element) {
-        let curentElement = false;
+    // getElementOnColision(element) {
+    //     let curentElement = false;
 
-        if (element.curentElement) {
-            curentElement = element.curentElement;
-        } else {
-            curentElement = element;
-        }
-        return curentElement;
-    }
+    //     if (element.collisionElement) {
+    //         curentElement = element.collisionElement;
+    //     } else {
+    //         curentElement = element;
+    //     }
+    //     return curentElement;
+    // }
 
     collisionSwich(colisionRun) {
         this.colisionRun = colisionRun;

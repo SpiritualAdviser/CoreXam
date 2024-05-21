@@ -157,20 +157,9 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             const IsCollision = relationBorderArray.find(relationBorder => this.checkCollision(mainBorder, relationBorder));
 
             if (IsCollision) {
-                this.fireEventOnColision(this.eventIsCollisions, { mainObj: mainObject, relationObj: relationObject, });
+                console.log('colision', mainObject, relationObject)
+                // this.fireEventOnColision(this.eventIsCollisions, { mainObj: mainObject, relationObj: relationObject, });
             }
-
-            // relationBorderArray.forEach(relationObj => {
-
-            //     const IsCollision = this.checkCollision(mainObj, relationObj);
-
-            //     if (IsCollision) { // need to fix twise fire event if 2 dorder parrams
-            //         // const curentMainObject = this.getElementOnColision(mainObject);
-            //         // const curentrelationObject = this.getElementOnColision(relationObject);
-
-            //         this.fireEventOnColision(this.eventIsCollisions, { mainObj: curentMainObject, relationObj: curentrelationObject, });
-            //     }
-            // });
         });
     }
 
@@ -192,6 +181,34 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
         return borderArray;
     }
 
+    showBorderCollision() {
+
+        this.groupObjects.forEach(group => {
+            group.objects.forEach(element => {
+
+                if (element.colisionBorder) {
+                 
+                    element.colisionBorder.forEach(borderObj => {
+
+                        const elementCoords = element.getBoundingClientRect();
+
+                        const newDiv = document.createElement('div');
+                        newDiv.style.position = 'fixed';
+                        newDiv.style.left = (elementCoords.left + borderObj.leftOfset) + 'px';
+                        newDiv.style.top = (elementCoords.top + borderObj.topOfset) + 'px';
+                        newDiv.style.width = borderObj.widthArea + 'px';
+                        newDiv.style.height = borderObj.heightArea + 'px';
+                        newDiv.style.border = '2px solid'
+
+                        element.parentElement.prepend(newDiv)
+                    });
+
+                } else {
+                    element.style.border = '2px solid';
+                }
+            });
+        });
+    }
 
     checkCollision(mainObject, relationObject) {
 
@@ -212,17 +229,6 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
 
         return IsCollision
     }
-
-    // getElementOnColision(element) {
-    //     let curentElement = false;
-
-    //     if (element.collisionElement) {
-    //         curentElement = element.collisionElement;
-    //     } else {
-    //         curentElement = element;
-    //     }
-    //     return curentElement;
-    // }
 
     collisionSwich(colisionRun) {
         this.colisionRun = colisionRun;

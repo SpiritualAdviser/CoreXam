@@ -217,14 +217,23 @@ class BaseCoreLogics {
         const framesOptions = instanceJson.bodyJson.frames;
         const allFrames = Object.values(instanceJson.bodyJson.frames);
         const animationParams = instanceJson.bodyJson.meta.frameTags;
-        canvas.key = asset.key;
 
-        if (asset.name) {
-            canvas.name = asset.name;
-        }
-        if (asset.id) {
-            canvas.id = asset.id;
-        }
+        for (const options in asset) {
+
+            if (asset.hasOwnProperty(options)) {
+
+                switch (options) {
+                    case 'tag':
+                        break;
+                    case 'contents':
+                        break;
+                    default:
+                        canvas[options] = asset[options];
+                        break;
+                }
+            }
+        };
+
         let frameSize = false;
 
         for (const param in framesOptions) {
@@ -233,6 +242,7 @@ class BaseCoreLogics {
                 break
             }
         }
+        
         canvas.width = frameSize.w;
         canvas.height = frameSize.h;
         const imageSprite = new Image();

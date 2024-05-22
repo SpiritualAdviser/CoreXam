@@ -172,7 +172,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
                 // collisionElement: element,
             }
 
-            newObject.option.left = element.option.left + border.leftOfset;
+            newObject.option.left = element.option.left  + border.leftOfset;
             newObject.option.right = newObject.option.left + border.widthArea;
             newObject.option.top = element.option.top + border.topOfset;
             newObject.option.bottom = newObject.option.top + border.heightArea;
@@ -187,17 +187,20 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             group.objects.forEach(element => {
 
                 if (element.colisionBorder) {
-                 
+
                     element.colisionBorder.forEach(borderObj => {
 
                         const elementCoords = element.getBoundingClientRect();
 
                         const newDiv = document.createElement('div');
                         newDiv.style.position = 'fixed';
+
                         newDiv.style.left = (elementCoords.left + borderObj.leftOfset) + 'px';
                         newDiv.style.top = (elementCoords.top + borderObj.topOfset) + 'px';
+
                         newDiv.style.width = borderObj.widthArea + 'px';
                         newDiv.style.height = borderObj.heightArea + 'px';
+                        
                         newDiv.style.border = '2px solid'
 
                         element.parentElement.prepend(newDiv)

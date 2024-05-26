@@ -53,15 +53,17 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
                 objects: [],
             };
             newGroup.id = typeObject;
-            newGroup.relationGroups = this.getRelationGroups(typeObject);
+            newGroup.relationGroups = this.getNameRelationGroups(typeObject);
             newGroup.objects.push(newObject);
             this.groupObjects.push(newGroup);
         }
         newObject.collision = true;
     }
 
-    getRelationGroups(typeObject) {
+    getNameRelationGroups(typeObject) {
+
         if (this.relationGroups) {
+
             let nameRelationGroups = false;
             for (let key in this.relationGroups) {
 
@@ -82,36 +84,38 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             this.groupObjects.forEach(mainGroup => {
 
                 if (mainGroup.relationGroups) {
-                    this.findReletionGroup(mainGroup);
+                    this.checkCollisionOptions(mainGroup);
                 }
             });
         }
     }
 
-    findReletionGroup(mainGroup) { // need optimisation
+
+    checkCollisionOptions(mainGroup) { // need optimisation
 
         mainGroup.relationGroups.forEach(reletionGroup => {
 
             const curentReletionGroup = this.groupObjects.find(group => group.id === reletionGroup);
 
-            if (curentReletionGroup) {
-                mainGroup.objects.forEach(mainObject => {
+            mainGroup.objects.forEach(mainObject => {
 
-                    if (mainObject.collision) {
-                        curentReletionGroup.objects.forEach(relationObject => {
+                this.checkOutsidePosition(mainObject);
 
-                            if (relationObject.collision) {
-                                this.checkOutsidePosition(mainObject);
-                                this.checkOutsidePosition(relationObject);
+                if (curentReletionGroup && mainObject.collision) {
 
-                                if (!mainObject.outside && !relationObject.outside) {
-                                    this.checkCollisionBorder(mainObject, relationObject);
-                                }
+                    curentReletionGroup.objects.forEach(relationObject => {
+                        this.checkOutsidePosition(relationObject);
+
+                        if (relationObject.collision) {
+
+                            if (!mainObject.outside && !relationObject.outside) {
+
+                                this.checkCollisionBorder(mainObject, relationObject);
                             }
-                        });
-                    }
-                });
-            }
+                        }
+                    });
+                }
+            });
         });
     }
 
@@ -172,7 +176,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
                 // collisionElement: element,
             }
 
-            newObject.option.left = element.option.left  + border.leftOfset;
+            newObject.option.left = element.option.left + border.leftOfset;
             newObject.option.right = newObject.option.left + border.widthArea;
             newObject.option.top = element.option.top + border.topOfset;
             newObject.option.bottom = newObject.option.top + border.heightArea;
@@ -200,7 +204,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
 
                         newDiv.style.width = borderObj.widthArea + 'px';
                         newDiv.style.height = borderObj.heightArea + 'px';
-                        
+
                         newDiv.style.border = '2px solid'
 
                         element.parentElement.prepend(newDiv)

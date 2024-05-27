@@ -6,6 +6,7 @@ const Device = require('./modules/gameLogic/device.js');
 // const Sounds = require('./modules/sound/audio.js');
 class BaseCoreLogics {
     constructor() {
+
         this.scene = document.getElementById('scene');
         this.gameModules = [];
         this.gameComponents = [];
@@ -37,11 +38,15 @@ class BaseCoreLogics {
                 this.startLogic(modul);
             })
         }
-        const statesManager = new StatesManager();
-        if (!CoreXam.App.Modules.AudioGame) {
 
-            const eventGameSamplesLoaded = new Event('modules.audio.samples.loaded');
-            dispatchEvent(eventGameSamplesLoaded);
+        if (CoreXam.App.Modules) {
+
+            const statesManager = new StatesManager();
+            if (!CoreXam.App.Modules.AudioGame) {
+
+                const eventGameSamplesLoaded = new Event('modules.audio.samples.loaded');
+                dispatchEvent(eventGameSamplesLoaded);
+            }
         }
     }
 
@@ -212,14 +217,23 @@ class BaseCoreLogics {
         const framesOptions = instanceJson.bodyJson.frames;
         const allFrames = Object.values(instanceJson.bodyJson.frames);
         const animationParams = instanceJson.bodyJson.meta.frameTags;
-        canvas.key = asset.key;
 
-        if (asset.name) {
-            canvas.name = asset.name;
-        }
-        if (asset.id) {
-            canvas.id = asset.id;
-        }
+        for (const options in asset) {
+
+            if (asset.hasOwnProperty(options)) {
+
+                switch (options) {
+                    case 'tag':
+                        break;
+                    case 'contents':
+                        break;
+                    default:
+                        canvas[options] = asset[options];
+                        break;
+                }
+            }
+        };
+
         let frameSize = false;
 
         for (const param in framesOptions) {
@@ -228,6 +242,7 @@ class BaseCoreLogics {
                 break
             }
         }
+        
         canvas.width = frameSize.w;
         canvas.height = frameSize.h;
         const imageSprite = new Image();

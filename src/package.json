@@ -4,8 +4,8 @@
   "author": "PomaXam",
   "license": "ISC",
   "homepage": "https://github.com/SpiritualAdviser/CoreXam",
-  "main": "build/load.js",
-  "version": "0.2.2",
+  "main": "load.js",
+  "version": "0.1.11",
   "scripts": {
     "build:prod": "webpack --config webpack.config.js --mode=production",
     "start": "webpack server --open --mode development",
@@ -26,3 +26,4 @@
     "engine"
   ]
 }
+

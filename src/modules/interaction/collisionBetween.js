@@ -155,7 +155,6 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             const IsCollision = relationBorderArray.find(relationBorder => this.checkCollision(mainBorder, relationBorder));
  
             if (IsCollision) {
-          
                 // console.log('colision', mainObject, relationObject)
                 this.fireEventOnColision(this.eventIsCollisions, { mainObj: mainObject, relationObj: relationObject, });
                 break;
@@ -179,7 +178,6 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             newObject.option.bottom = newObject.option.top + border.heightArea;
             borderArray.push(newObject);
         });
-
         return borderArray;
     }
 

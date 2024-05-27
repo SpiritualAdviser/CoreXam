@@ -3,7 +3,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     constructor() {
         super();
         this.requestAnimationFrameloop = false;
-        this.groupObjects = [];
+        this.collisionGroupsObjects = [];
         this.relationGroups = false;
         this.tickCount = 0;
         this.ticksPerFrame = 2;
@@ -35,14 +35,12 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     }
 
     addObjectToCollision(newObject, typeObject) {
-
         this.addToGroup(newObject, typeObject);
-
     }
 
     addToGroup(newObject, typeObject) {
 
-        const curentGpoup = this.groupObjects.find(group => group.id === typeObject);
+        const curentGpoup = this.collisionGroupsObjects.find(group => group.id === typeObject);
 
         if (curentGpoup) {
             curentGpoup.objects.push(newObject);
@@ -53,11 +51,13 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
                 objects: [],
             };
             newGroup.id = typeObject;
-            newGroup.relationGroups = this.getNameRelationGroups(typeObject);
+            newGroup.nameRelationGroups = this.getNameRelationGroups(typeObject);
+            newGroup.relationGroups = this.setRelationGroups(newGroup);
             newGroup.objects.push(newObject);
-            this.groupObjects.push(newGroup);
+            this.collisionGroupsObjects.push(newGroup);
         }
         newObject.collision = true;
+
     }
 
     getNameRelationGroups(typeObject) {
@@ -73,6 +73,22 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             }
             return nameRelationGroups;
         }
+    }
+
+    setRelationGroups(newGroup) {
+
+        let gpoups = [];
+        if (newGroup.nameRelationGroups) {
+            newGroup.nameRelationGroups.forEach(nameGroup => {
+
+                const curentGpoup = this.collisionGroupsObjects.find(collisionGroup => collisionGroup.id === nameGroup);
+
+                if (curentGpoup) {
+                    gpoups.push(curentGpoup);
+                }
+            });
+        }
+        return gpoups;
     }
 
     runCollision() {
@@ -99,19 +115,12 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
 
             mainGroup.objects.forEach(mainObject => {
 
-                this.checkOutsidePosition(mainObject);
-
                 if (curentReletionGroup && mainObject.collision) {
 
                     curentReletionGroup.objects.forEach(relationObject => {
-                        this.checkOutsidePosition(relationObject);
 
                         if (relationObject.collision) {
-
-                            if (!mainObject.outside && !relationObject.outside) {
-
-                                this.checkCollisionBorder(mainObject, relationObject);
-                            }
+                            this.checkCollisionBorder(mainObject, relationObject);
                         }
                     });
                 }
@@ -121,8 +130,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
 
     checkOutsidePosition(verifyObject) {
 
-        const verifyObjectOpt = this.getCoords(verifyObject);
-        verifyObject.option = verifyObjectOpt;
+        const verifyObjectOpt = verifyObject.option;
 
         if (verifyObjectOpt.bottom > this.bordeAreaColision.top && verifyObjectOpt.top < this.scene.clientHeight - this.bordeAreaColision.bottom &&
             verifyObjectOpt.right > this.bordeAreaColision.left && verifyObjectOpt.left < this.scene.clientWidth - this.bordeAreaColision.right) {
@@ -143,7 +151,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     checkCollisionBorder(mainObject, relationObject) {
         let mainBorderArray = [];
         let relationBorderArray = [];
-
+        debugger
         if (mainObject.colisionBorder) {
             mainBorderArray = this.setBorderOption(mainObject);
         } else {
@@ -168,6 +176,9 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     }
 
     setBorderOption(element) {
+        const verifyObjectOpt = this.getCoords(element);
+        element.option = verifyObjectOpt;
+
         const borderArray = [];
         element.colisionBorder.forEach(border => {
 
@@ -182,6 +193,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             newObject.option.bottom = newObject.option.top + border.heightArea;
             borderArray.push(newObject);
         });
+        debugger
         return borderArray;
     }
 
@@ -218,29 +230,33 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     }
 
     checkCollision(mainObject, relationObject) {
+        debugger
+        this.checkOutsidePosition(mainObject);
+        this.checkOutsidePosition(relationObject);
 
-        const mainObjectOpt = mainObject.option;
-        const relationObjectOpt = relationObject.option;
+        if (!mainObject.collision && !relationObject.collision) {
+            const mainObjectOpt = mainObject.option;
+            const relationObjectOpt = relationObject.option;
 
-        let xColl = false;
-        let yColl = false;
-        let IsCollision = false;
+            let xColl = false;
+            let yColl = false;
+            let IsCollision = false;
 
-        xColl = (mainObjectOpt.right > relationObjectOpt.left)
-            && (mainObjectOpt.left < relationObjectOpt.right);
+            xColl = (mainObjectOpt.right > relationObjectOpt.left)
+                && (mainObjectOpt.left < relationObjectOpt.right);
 
-        yColl = (mainObjectOpt.bottom > relationObjectOpt.top)
-            && (mainObjectOpt.top < relationObjectOpt.bottom)
+            yColl = (mainObjectOpt.bottom > relationObjectOpt.top)
+                && (mainObjectOpt.top < relationObjectOpt.bottom)
 
-        IsCollision = (xColl && yColl);
-
-        return IsCollision
+            IsCollision = (xColl && yColl);
+            return IsCollision
+        }
     }
 
     collisionSwich(colisionRun) {
         this.colisionRun = colisionRun;
         if (colisionRun) {
-            this.run();
+            // this.run();
         }
     }
 

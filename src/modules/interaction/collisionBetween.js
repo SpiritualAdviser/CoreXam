@@ -3,7 +3,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     constructor() {
         super();
         this.requestAnimationFrameloop = false;
-        this.groupObjects = [];
+        this.collisionGroups = [];
         this.relationGroups = false;
         this.tickCount = 0;
         this.ticksPerFrame = 2;
@@ -35,14 +35,12 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     }
 
     addObjectToCollision(newObject, typeObject) {
-
         this.addToGroup(newObject, typeObject);
-
     }
 
     addToGroup(newObject, typeObject) {
 
-        const curentGpoup = this.groupObjects.find(group => group.id === typeObject);
+        const curentGpoup = this.collisionGroups.find(group => group.id === typeObject);
 
         if (curentGpoup) {
             curentGpoup.objects.push(newObject);
@@ -53,11 +51,12 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
                 objects: [],
             };
             newGroup.id = typeObject;
-            newGroup.relationGroups = this.getNameRelationGroups(typeObject);
+            newGroup.nameRelationGroups = this.getNameRelationGroups(typeObject);
             newGroup.objects.push(newObject);
-            this.groupObjects.push(newGroup);
+            this.collisionGroups.push(newGroup);
         }
         newObject.collision = true;
+
     }
 
     getNameRelationGroups(typeObject) {
@@ -81,37 +80,31 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
         if (this.tickCount > this.ticksPerFrame) {
             this.tickCount = 0;
 
-            this.groupObjects.forEach(mainGroup => {
+            this.collisionGroups.forEach(mainGroup => {
 
-                if (mainGroup.relationGroups) {
+                if (mainGroup.nameRelationGroups) {
                     this.checkCollisionOptions(mainGroup);
                 }
             });
         }
     }
 
-
     checkCollisionOptions(mainGroup) { // need optimisation
 
-        mainGroup.relationGroups.forEach(reletionGroup => {
+        mainGroup.nameRelationGroups.forEach(nameRelationGroup => {
 
-            const curentReletionGroup = this.groupObjects.find(group => group.id === reletionGroup);
+            const curentReletionGroup = this.collisionGroups.find(group => group.id === nameRelationGroup);
 
             mainGroup.objects.forEach(mainObject => {
-
-                this.checkOutsidePosition(mainObject);
 
                 if (curentReletionGroup && mainObject.collision) {
 
                     curentReletionGroup.objects.forEach(relationObject => {
-                        this.checkOutsidePosition(relationObject);
 
                         if (relationObject.collision) {
-
-                            if (!mainObject.outside && !relationObject.outside) {
-
-                                this.checkCollisionBorder(mainObject, relationObject);
-                            }
+                            this.getCoords(mainObject);
+                            this.getCoords(relationObject);
+                            this.checkCollisionBorder(mainObject, relationObject);
                         }
                     });
                 }
@@ -121,8 +114,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
 
     checkOutsidePosition(verifyObject) {
 
-        const verifyObjectOpt = this.getCoords(verifyObject);
-        verifyObject.option = verifyObjectOpt;
+        const verifyObjectOpt = verifyObject.option;
 
         if (verifyObjectOpt.bottom > this.bordeAreaColision.top && verifyObjectOpt.top < this.scene.clientHeight - this.bordeAreaColision.bottom &&
             verifyObjectOpt.right > this.bordeAreaColision.left && verifyObjectOpt.left < this.scene.clientWidth - this.bordeAreaColision.right) {
@@ -141,6 +133,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
     }
 
     checkCollisionBorder(mainObject, relationObject) {
+
         let mainBorderArray = [];
         let relationBorderArray = [];
 
@@ -156,18 +149,22 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
             relationBorderArray.push(relationObject);
         }
 
-        mainBorderArray.forEach(mainBorder => {
-
+        for (let index = 0; index < mainBorderArray.length; ++index) {
+            const mainBorder = mainBorderArray[index];
+      
             const IsCollision = relationBorderArray.find(relationBorder => this.checkCollision(mainBorder, relationBorder));
-
+ 
             if (IsCollision) {
+          
                 // console.log('colision', mainObject, relationObject)
                 this.fireEventOnColision(this.eventIsCollisions, { mainObj: mainObject, relationObj: relationObject, });
+                break;
             }
-        });
+        }
     }
 
     setBorderOption(element) {
+
         const borderArray = [];
         element.colisionBorder.forEach(border => {
 
@@ -175,19 +172,20 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
                 option: {},
                 // collisionElement: element,
             }
-
+            newObject.collision = element.collision;
             newObject.option.left = element.option.left + border.leftOfset;
             newObject.option.right = newObject.option.left + border.widthArea;
             newObject.option.top = element.option.top + border.topOfset;
             newObject.option.bottom = newObject.option.top + border.heightArea;
             borderArray.push(newObject);
         });
+
         return borderArray;
     }
 
     showBorderCollision() {
 
-        this.groupObjects.forEach(group => {
+        this.collisionGroups.forEach(group => {
             group.objects.forEach(element => {
 
                 if (element.colisionBorder) {
@@ -219,22 +217,26 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
 
     checkCollision(mainObject, relationObject) {
 
-        const mainObjectOpt = mainObject.option;
-        const relationObjectOpt = relationObject.option;
+        this.checkOutsidePosition(mainObject);
+        this.checkOutsidePosition(relationObject);
 
-        let xColl = false;
-        let yColl = false;
-        let IsCollision = false;
+        if (mainObject.collision && relationObject.collision) {
+            const mainObjectOpt = mainObject.option;
+            const relationObjectOpt = relationObject.option;
 
-        xColl = (mainObjectOpt.right > relationObjectOpt.left)
-            && (mainObjectOpt.left < relationObjectOpt.right);
+            let xColl = false;
+            let yColl = false;
+            let IsCollision = false;
 
-        yColl = (mainObjectOpt.bottom > relationObjectOpt.top)
-            && (mainObjectOpt.top < relationObjectOpt.bottom)
+            xColl = (mainObjectOpt.right > relationObjectOpt.left)
+                && (mainObjectOpt.left < relationObjectOpt.right);
 
-        IsCollision = (xColl && yColl);
+            yColl = (mainObjectOpt.bottom > relationObjectOpt.top)
+                && (mainObjectOpt.top < relationObjectOpt.bottom)
 
-        return IsCollision
+            IsCollision = (xColl && yColl);
+            return IsCollision
+        }
     }
 
     collisionSwich(colisionRun) {
@@ -246,7 +248,7 @@ class CollisionBetween extends CoreXam.CoreLogics.BaseCoreLogics {
 
     getCoords(element) {
         let elementOptions = element.getBoundingClientRect();
-        return elementOptions;
+        element.option = elementOptions;
     }
 
     removeCollision(element, needDestroy, timeLazyDestroy = false) {
